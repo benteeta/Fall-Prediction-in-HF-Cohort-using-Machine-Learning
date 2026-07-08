@@ -166,17 +166,8 @@ Users should not place identifiable or restricted health data in this public rep
 
 The analysis is implemented in R. Key packages include:
 
-* `data.table`, `dplyr`, `tidyr`, `lubridate`
-* `mice`
-* `caret`
-* `glmnet`
-* `ranger`
-* `ada`
-* `xgboost`
-* `lightgbm`
-* `pROC`
-* `shiny`
-* `plotly`
+* `data.table`, `dplyr`, `tidyr`, `lubridate`, `mice`, `caret`, `glmnet`, `ranger`, `ada`
+* `xgboost`, `lightgbm`, `pROC`, `shiny`, `plotly`
 
 ## Project Status
 
@@ -201,7 +192,7 @@ A licence will be added before public release of the completed repository.
 
 ## Contact
 
-Benjamin Owusu
+Dr. Benjamin Atta Owusu
 Postdoctoral Research Fellow
 University of Exeter Medical School
 
