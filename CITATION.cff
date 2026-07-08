@@ -1,1 +1,22 @@
-
+cff-version: 1.2.0
+title: "Fall Prediction in Heart Failure Cohort using Machine Learning"
+message: "If you use this repository, please cite it as below."
+type: software
+authors:
+  - family-names: Owusu
+    given-names: Benjamin Atta
+    affiliation: Exeter Collaboration for Academic Primary Care (APEx), University of Exeter Medical School
+repository-code: "https://github.com/benteeta/Fall-Prediction-in-HF-Cohort-using-Machine-Learning"
+url: "https://github.com/benteeta/Fall-Prediction-in-HF-Cohort-using-Machine-Learning"
+abstract: "A reproducible R-based machine learning pipeline for predicting falls among people with heart failure using routinely collected healthcare data."
+keywords:
+  - heart failure
+  - falls
+  - machine learning
+  - routinely collected health data
+  - electronic health records
+  - prediction modelling
+  - epidemiology
+license: MIT
+version: 0.1.0
+date-released: 2026-07-09
