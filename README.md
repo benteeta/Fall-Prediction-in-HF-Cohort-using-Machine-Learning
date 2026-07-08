@@ -166,9 +166,7 @@ Users should not place identifiable or restricted health data in this public rep
 
 The analysis is implemented in R. Key packages include:
 
-* `data.table` * `dplyr`
-* `tidyr`
-* `lubridate`
+* `data.table`, `dplyr`, `tidyr`, `lubridate`
 * `mice`
 * `caret`
 * `glmnet`
