@@ -1,1 +1,55 @@
+# R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+*.Rproj
 
+# renv
+renv/library/
+renv/staging/
+renv/python/
+renv/local/
+renv/cellar/
+
+# Data files - do not commit patient-level or restricted data
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Allow synthetic data
+!data/synthetic/
+!data/synthetic/*
+
+# Outputs
+outputs/models/*
+outputs/tables/*
+outputs/figures/*
+!outputs/models/.gitkeep
+!outputs/tables/.gitkeep
+!outputs/figures/.gitkeep
+
+# Large files
+*.rds
+*.RDS
+*.csv
+*.xlsx
+*.xls
+*.sav
+*.dta
+*.parquet
+*.feather
+
+# Allow selected synthetic CSV files if needed
+!data/synthetic/*.csv
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Shiny
+rsconnect/
