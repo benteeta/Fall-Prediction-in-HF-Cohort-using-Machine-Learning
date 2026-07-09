@@ -48,9 +48,9 @@ The following variables were considered.
 
 Patients were randomly divided into
 
-- Development cohort
-- Internal test cohort
-- External validation cohort
+- Development cohort (30%)
+- Internal test cohort (20%)
+- External validation cohort (50%)
 
 using patient-level sampling.
 
