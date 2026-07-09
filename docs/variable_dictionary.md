@@ -13,5 +13,5 @@
 | Medication    | Medication combination            | Factor    |
 | Fallen        | Outcome                           | Binary    |
 | followup_time | Time to censoring/event           | Numeric   |
-| Status        | Competing risk status             | Integer   |
+| Death         | Competing risk status             | Integer   |
 
