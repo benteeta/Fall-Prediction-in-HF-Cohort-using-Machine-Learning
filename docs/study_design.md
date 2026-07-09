@@ -4,13 +4,9 @@
 
 Retrospective cohort study.
 
----
-
 ## Population
 
 Adults with heart failure identified from routinely collected healthcare data.
-
----
 
 ## Outcome
 
@@ -20,8 +16,6 @@ Falls were identified from
 
 - Primary care records
 - Hospital admission records
-
----
 
 ## Candidate Predictors
 
