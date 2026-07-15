@@ -11,18 +11,14 @@
 # - data/processed/hf_cohort_base.rds
 # - data/processed/mltc_annual.rds
 ############################################################
-
 source(here::here("R", "01_load_libraries.R"))
 source(here::here("R", "helper_functions.R"))
-
 
 #-----------------------------------------------------------
 # Load imported data
 #-----------------------------------------------------------
-
 patient_data <- readRDS(here::here("data", "processed", "patient_data_raw.rds"))
 index_dates  <- readRDS(here::here("data", "processed", "index_dates_raw.rds"))
-
 
 #-----------------------------------------------------------
 # Prepare patient demographics
@@ -49,104 +45,34 @@ patient_year_range <-  index_dates_clean %>%  rowwise() %>%  mutate(minyr = min(
 annual_grid <-  patient_year_range %>%  rowwise() %>%  mutate(year = list(seq(minyr, maxyr))) %>%  unnest(year) %>%  ungroup() %>%  select(patID, year) %>%
   mutate(year = as.numeric(year))
 
-
 #-----------------------------------------------------------
 # Derive annual long-term condition count
 #-----------------------------------------------------------
+mltc_long <- index_dates_clean %>% mutate(minyr = apply(select(., all_of(date_cols)),  1,
+      function(x) min(lubridate::year(x), na.rm = TRUE)),  maxyr = 2023) %>%
+  rowwise() %>%  mutate(year = list(seq(minyr, maxyr))) %>% unnest(year) %>% ungroup() %>%
+  mutate(years_withHFdiag = year - lubridate::year(Indexdate_HFailure)) %>%
+  pivot_longer(cols = all_of(date_cols),  names_to = "condition_type",  values_to = "condition_date") %>%
+  mutate(condition_type = stringr::str_remove(condition_type, "^Indexdate_"), condition = ifelse(lubridate::year(condition_date) == year, condition_type,  NA_character_)) %>%
+  filter(!is.na(condition)) %>%  select(patID, year, years_withHFdiag, condition) %>%  pivot_wider(names_from = condition, values_from = condition)
 
-mltc_long <-
-  index_dates_clean %>%
-  mutate(
-    minyr = apply(
-      select(., all_of(date_cols)),
-      1,
-      function(x) min(lubridate::year(x), na.rm = TRUE)
-    ),
-    maxyr = 2023
-  ) %>%
-  rowwise() %>%
-  mutate(year = list(seq(minyr, maxyr))) %>%
-  unnest(year) %>%
-  ungroup() %>%
-  mutate(
-    years_withHFdiag = year - lubridate::year(Indexdate_HFailure)
-  ) %>%
-  pivot_longer(
-    cols = all_of(date_cols),
-    names_to = "condition_type",
-    values_to = "condition_date"
-  ) %>%
-  mutate(
-    condition_type = stringr::str_remove(condition_type, "^Indexdate_"),
-    condition = ifelse(
-      lubridate::year(condition_date) == year,
-      condition_type,
-      NA_character_
-    )
-  ) %>%
-  filter(!is.na(condition)) %>%
-  select(patID, year, years_withHFdiag, condition) %>%
-  pivot_wider(
-    names_from = condition,
-    values_from = condition
-  )
+mltc_wide <- annual_grid %>%  left_join(mltc_long, by = c("patID", "year")) %>%
+  group_by(patID) %>%  tidyr::fill(-year, .direction = "down") %>%  ungroup()
+condition_cols <- setdiff(names(mltc_wide),  c("patID", "year", "years_withHFdiag"))
 
-
-mltc_wide <-
-  annual_grid %>%
-  left_join(mltc_long, by = c("patID", "year")) %>%
-  group_by(patID) %>%
-  tidyr::fill(-year, .direction = "down") %>%
-  ungroup()
-
-condition_cols <- setdiff(
-  names(mltc_wide),
-  c("patID", "year", "years_withHFdiag")
-)
-
-mltc_annual <-
-  mltc_wide %>%
-  mutate(
-    nMLTCs = rowSums(!is.na(across(all_of(condition_cols)))),
-    nMLTCs = ifelse(!is.na(HFailure), nMLTCs - 1, nMLTCs)
-  ) %>%
+mltc_annual <-  mltc_wide %>%  mutate(nMLTCs = rowSums(!is.na(across(all_of(condition_cols)))),    nMLTCs = ifelse(!is.na(HFailure), nMLTCs - 1, nMLTCs)) %>%
   select(patID, year, years_withHFdiag, nMLTCs)
-
 
 #-----------------------------------------------------------
 # Restrict to years after heart failure diagnosis
 #-----------------------------------------------------------
+hf_years <- patient_base %>%  select(patid, patID) %>%  left_join(hf_index, by = c("patid", "patID")) %>%
+  left_join(annual_grid, by = "patID") %>% mutate(Indexdate_HFailure = lubridate::ymd(Indexdate_HFailure),  years_withHFdiag = year - lubridate::year(Indexdate_HFailure)) %>%
+  filter(years_withHFdiag > -1) %>%  select(-Indexdate_HFailure)
 
-hf_years <-
-  patient_base %>%
-  select(patid, patID) %>%
-  left_join(hf_index, by = c("patid", "patID")) %>%
-  left_join(annual_grid, by = "patID") %>%
-  mutate(
-    Indexdate_HFailure = lubridate::ymd(Indexdate_HFailure),
-    years_withHFdiag = year - lubridate::year(Indexdate_HFailure)
-  ) %>%
-  filter(years_withHFdiag > -1) %>%
-  select(-Indexdate_HFailure)
-
-
-hf_cohort_base <-
-  patient_base %>%
-  left_join(hf_years, by = c("patid", "patID")) %>%
-  filter(!is.na(years_withHFdiag)) %>%
-  distinct()
-
-
+hf_cohort_base <-  patient_base %>%  left_join(hf_years, by = c("patid", "patID")) %>%  filter(!is.na(years_withHFdiag)) %>%  distinct()
 #-----------------------------------------------------------
 # Save outputs
 #-----------------------------------------------------------
-
-saveRDS(
-  hf_cohort_base,
-  here::here("data", "processed", "hf_cohort_base.rds")
-)
-
-saveRDS(
-  mltc_annual,
-  here::here("data", "processed", "mltc_annual.rds")
-)
+saveRDS(hf_cohort_base,  here::here("data", "processed", "hf_cohort_base.rds"))
+saveRDS(mltc_annual,  here::here("data", "processed", "mltc_annual.rds"))
